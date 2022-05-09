@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+    backend:
+        container_name: api-name
+        restart: always
+        build: .
+        ports:
+            - 4000:4000
+        volumes:
+            - ./:/usr/src/app
+            - /usr/src/app/node_modules
+        environment:
+            - PG_USER=fernanda
+            - PG_PASSWORD=fernanda
+            - PG_DATABASE=postgres
+            - PG_HOST=db
+        depends_on: 
+            - db
+        command: npm run dev
+    db: 
+        container_name: db
+        image: postgres:13
+        ports: 
+            - 5432:5432
+        environment:
+            - POSTGRES_DB=postgres
+            - POSTGRES_PASSWORD_FILE=/run/secrets/postgresql_password
+            - POSTGRES_USER=fernanda
+            - POSTGRES_HOST_AUTH_METHOD=trust
+            - PGDATA=/var/lib/postgresql/data/pgdata
+        volumes:
+            - db-data:/var/lib/postgresql/data/pgdata
+        secrets:
+            - postgresql_password
+volumes:
+  db-data:
+
+secrets:
+  postgresql_password:
+    file: odoo_pg_pass
